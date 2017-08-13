@@ -1,0 +1,68 @@
+apply plugin: 'java'
+apply plugin: 'findbugs'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'net.jcip:jcip-annotations:1.0'
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.healthmarketscience.rmiio/rmiio
+    compile group: 'com.healthmarketscience.rmiio', name: 'rmiio', version: '2.0.4'
+    // https://mvnrepository.com/artifact/net.jcip/jcip-annotations
+    compile group: 'net.jcip', name: 'jcip-annotations', version: '1.0'
+}
+
+findbugs {
+    ignoreFailures = true
+}
+
+tasks.withType(FindBugs) {
+    reports {
+          xml.enabled false
+              html.enabled true
+                }
+}
+
+buildscript{
+  repositories {
+    mavenCentral()
+  }
+}
+
+
+
+task startSlave1(dependsOn: 'classes', type: JavaExec){
+	description = "Start the slave server"
+	main = "server.slave.SlaveServer"
+	classpath = sourceSets.main.runtimeClasspath
+	args=["Slave1","127.0.0.1","19092"]
+}
+
+task startSlave2(dependsOn: 'classes', type: JavaExec){
+	description = "Start the slave server"
+	main = "server.slave.SlaveServer"
+	classpath = sourceSets.main.runtimeClasspath
+	args=["Slave2","127.0.0.1","19093"]
+}
+
+task startMaster(dependsOn: 'classes', type: JavaExec){
+	description = "Start the coordinator server"
+	main = "server.master.MasterServer"
+	classpath = sourceSets.main.runtimeClasspath
+	args=["Master","127.0.0.1","19091"]
+}
+
+task startClient(dependsOn: 'classes', type: JavaExec){
+	description = "Start the client server to submit the task"
+	main = "server.client.ClientServer"
+	classpath = sourceSets.main.runtimeClasspath
+}
+
